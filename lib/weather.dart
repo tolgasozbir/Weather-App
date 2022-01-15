@@ -95,21 +95,25 @@ class Location {
         required this.name,
         required this.region,
         required this.country,
+        required this.localTime
     });
 
     final String name;
     final String region;
     final String country;
+    final String localTime;
 
     factory Location.fromJson(Map<String, dynamic> json) => Location(
         name: json["name"] == null ? null : json["name"],
         region: json["region"] == null ? null : json["region"],
         country: json["country"] == null ? null : json["country"],
+        localTime: json["localtime"] == null ? null : json["localtime"],
     );
 
     Map<String, dynamic> toJson() => {
         "name": name == null ? null : name,
         "region": region == null ? null : region,
         "country": country == null ? null : country,
+        "localtime": localTime == null ? null : localTime,
     };
 }

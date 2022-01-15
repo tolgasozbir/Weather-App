@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/Api.dart';
 import 'package:weather_app/context_extension.dart';
+import 'package:weather_app/detail_screen.dart';
 
 import 'package:weather_app/weather.dart';
 import 'dart:convert';
@@ -23,6 +24,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffCBE6F9),
       body: Center(
         child: weatherData()
       ),
@@ -31,12 +33,13 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget weatherData() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           Expanded( flex: 10, child: mainCity()),
           Spacer(flex: 1,),
-          Align(alignment: Alignment.center, child: Text("Other Citys",style: context.theme.textTheme.headline6)),
+          Expanded(child: Align(alignment: Alignment.center, child: Text("Other Citys",style: context.theme.textTheme.headline6))),
+          Spacer(),
           Expanded( flex: 15, child: otherCities(),
           )
         ],
@@ -54,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
         } else if (snapshot.hasError) {
           return Text(snapshot.error.toString());
         }
-        return Text("Await for data");
+        return Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -63,7 +66,6 @@ class _MainScreenState extends State<MainScreen> {
     return Container(
       width: context.dynamicWidth(0.85),
       decoration: BoxDecoration(
-        color: Colors.blue.shade100, 
         borderRadius: BorderRadius.all(Radius.circular(24))
       ),
       child: Column(
@@ -106,7 +108,7 @@ class _MainScreenState extends State<MainScreen> {
         } else if (snapshot.hasError) {
           return Text(snapshot.error.toString());
         }
-        return Text("Await for data");
+        return Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -114,7 +116,17 @@ class _MainScreenState extends State<MainScreen> {
   Widget otherCityCard(Weather? weatherOther) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.blue, 
+        boxShadow: [
+            BoxShadow(
+              color: Color(0xff80A0CC),
+              blurRadius: 8.0,
+              spreadRadius: 4.0,
+            )
+          ],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF30AAFF),Color(0xffbfe1ff)]),
         borderRadius: BorderRadius.all(Radius.circular(24))
       ),
       child: Padding(
@@ -134,65 +146,80 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Container cardMainCityWeather(Weather weather) {
+  Widget cardMainCityWeather(Weather weather) {
     String weatherText = utf8convert(weather.current!.condition!.text);
-    return Container(
-          width: context.dynamicWidth(0.85),
-          decoration: BoxDecoration(
-            color: Colors.blue, 
-            borderRadius: BorderRadius.all(Radius.circular(24))
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      SizedBox(width: context.dynamicWidth(0.32), child: Image.network("http:"+weather.current!.condition!.icon,fit: BoxFit.contain,)),
-                      Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(weather.location!.region,style: context.theme.textTheme.headline4!.copyWith(color: Color(0xBF000000),fontWeight: FontWeight.w500)),
-                            Text(weatherText),
-                          ],
+    return GestureDetector(
+      child: Container(
+            width: context.dynamicWidth(0.85),
+            decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Color(0xff80A0CC),
+                blurRadius: 8.0,
+                spreadRadius: 4.0,
+              )
+            ],
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xffA0D0E0), Color(0xFF30AAFF)]),
+              borderRadius: BorderRadius.all(Radius.circular(24))
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        SizedBox(width: context.dynamicWidth(0.32), child: Image.network("http:"+weather.current!.condition!.icon,fit: BoxFit.contain,)),
+                        Expanded(
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(weather.location!.region,style: context.theme.textTheme.headline4!.copyWith(color: Color(0xBF000000),fontWeight: FontWeight.w500)),
+                              Text(weatherText),
+                            ],
+                          ),
                         ),
-                      ),
-                      Text(weather.current!.tempC.toInt().toString()+"°",style: context.theme.textTheme.headline2)
-                    ],
-                  ),
-                ),
-      
-                Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      children: [
-                        SizedBox(width: context.dynamicWidth(0.12), child: Image.asset("assets/temp.png")),
-                        Text("feels like",style: context.theme.textTheme.headline6),
-                        Text(weather.current!.feelslikeC.toString()+"°",style: context.theme.textTheme.headline6!.copyWith(fontWeight: FontWeight.normal)),
-                      ],
-                    ),                    
-                    
-                    Column(
-                      children: [
-                        SizedBox(width: context.dynamicWidth(0.12), child: Image.asset("assets/wind.png")),
-                        Text("Wind",style: context.theme.textTheme.headline6),
-                        Text(weather.current!.windKph.toString()+" km/h",style: context.theme.textTheme.headline6!.copyWith(fontWeight: FontWeight.normal)),
-                      ],
-                    ),                    
-                    
-                    Column(
-                      children: [
-                        SizedBox(width: context.dynamicWidth(0.12), child: Image.asset("assets/humidity.png")),
-                        Text("Humidity",style: context.theme.textTheme.headline6),
-                        Text(weather.current!.humidity.toString()+" %",style: context.theme.textTheme.headline6!.copyWith(fontWeight: FontWeight.normal)),
+                        Text(weather.current!.tempC.toInt().toString()+"°",style: context.theme.textTheme.headline2)
                       ],
                     ),
-                  ],
-                ),
-              ],
+                  ),
+        
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        children: [
+                          SizedBox(width: context.dynamicWidth(0.12), child: Image.asset("assets/temp.png")),
+                          Text("feels like",style: context.theme.textTheme.headline6),
+                          Text(weather.current!.feelslikeC.toString()+"°",style: context.theme.textTheme.headline6!.copyWith(fontWeight: FontWeight.normal)),
+                        ],
+                      ),                    
+                      
+                      Column(
+                        children: [
+                          SizedBox(width: context.dynamicWidth(0.12), child: Image.asset("assets/wind.png")),
+                          Text("Wind",style: context.theme.textTheme.headline6),
+                          Text(weather.current!.windKph.toString()+" km/h",style: context.theme.textTheme.headline6!.copyWith(fontWeight: FontWeight.normal)),
+                        ],
+                      ),                    
+                      
+                      Column(
+                        children: [
+                          SizedBox(width: context.dynamicWidth(0.12), child: Image.asset("assets/humidity.png")),
+                          Text("Humidity",style: context.theme.textTheme.headline6),
+                          Text(weather.current!.humidity.toString()+" %",style: context.theme.textTheme.headline6!.copyWith(fontWeight: FontWeight.normal)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        );
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weather)));
+          },
+    );
   }
 }
