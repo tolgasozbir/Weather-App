@@ -28,26 +28,20 @@ class _DetailScreenState extends State<DetailScreen> {
         windSpeed += widget.weather.current!.windKph*5;
         humidity += widget.weather.current!.humidity*2;
         //TODO: max values 210
-        if (feelsLikeC<=0) {
-          feelsLikeC*=-1;
-        }
-
-        if (feelsLikeC<=20) {
+        if (feelsLikeC<20) {
           feelsLikeC=20;
         }
-        if (feelsLikeC>=205) {
+        if (feelsLikeC>205) {
           feelsLikeC=205;
         }
         if (windSpeed<=0) {
           windSpeed=20;
         }    
-        if (windSpeed>=205) {
+        if (windSpeed>205) {
           windSpeed=205;
         }
-                print(feelsLikeC.toString());
-
-        });
       });
+    });
   }
 
   @override

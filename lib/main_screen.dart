@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
 
   FutureBuilder<Weather> mainCity() {
     return FutureBuilder<Weather>(
-      future: _api.getWeather("gebze"),
+      future: _api.getWeather("Kocaeli"),
       builder: (context, snapshot) {
         if (snapshot.hasData) {  
           Weather? _weather = snapshot.data;
@@ -108,35 +108,40 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget otherCityCard(Weather? weatherOther) {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-            BoxShadow(
-              color: Color(0xff80A0CC),
-              blurRadius: 8.0,
-              spreadRadius: 4.0,
-            )
-          ],
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF30AAFF),Color(0xffbfe1ff)]),
-        borderRadius: BorderRadius.all(Radius.circular(24))
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Stack(
-          children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(weatherOther!.location!.name,style: context.theme.textTheme.headline5!.copyWith(fontWeight: FontWeight.w600)),
-                SizedBox(width: context.dynamicWidth(0.16), child: Image.network("http:"+weatherOther.current!.condition!.icon,fit: BoxFit.cover,)),
-              ],
-            ),
-            Positioned(bottom: 0, right: 0, child: Text(weatherOther.current!.tempC.toString()+"°",style: context.theme.textTheme.headline4)),
-          ],
+    return GestureDetector(
+      child: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+              BoxShadow(
+                color: Color(0xff80A0CC),
+                blurRadius: 8.0,
+                spreadRadius: 4.0,
+              )
+            ],
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF30AAFF),Color(0xffbfe1ff)]),
+          borderRadius: BorderRadius.all(Radius.circular(24))
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Stack(
+            children: [
+              Column(crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(weatherOther!.location!.name,style: context.theme.textTheme.headline5!.copyWith(fontWeight: FontWeight.w600)),
+                  SizedBox(width: context.dynamicWidth(0.16), child: Image.network("http:"+weatherOther.current!.condition!.icon,fit: BoxFit.cover,)),
+                ],
+              ),
+              Positioned(bottom: 0, right: 0, child: Text(weatherOther.current!.tempC.toString()+"°",style: context.theme.textTheme.headline4)),
+            ],
+          ),
         ),
       ),
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weatherOther)));
+      },
     );
   }
 
