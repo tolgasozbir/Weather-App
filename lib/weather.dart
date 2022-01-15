@@ -37,7 +37,6 @@ class Current {
         required this.condition,
         required this.windKph,
         required this.humidity,
-        required this.cloud,
         required this.feelslikeC,
     });
 
@@ -46,7 +45,6 @@ class Current {
     final Condition? condition;
     final double windKph;
     final int humidity;
-    final int cloud;
     final double feelslikeC;
 
     factory Current.fromJson(Map<String, dynamic> json) => Current(
@@ -55,7 +53,6 @@ class Current {
         condition: json["condition"] == null ? null : Condition.fromJson(json["condition"]),
         windKph: json["wind_kph"] == null ? null : json["wind_kph"],
         humidity: json["humidity"] == null ? null : json["humidity"],
-        cloud: json["cloud"] == null ? null : json["cloud"],
         feelslikeC: json["feelslike_c"] == null ? null : json["feelslike_c"],
     );
 
@@ -65,7 +62,6 @@ class Current {
         "condition": condition == null ? null : condition?.toJson(),
         "wind_kph": windKph == null ? null : windKph,
         "humidity": humidity == null ? null : humidity,
-        "cloud": cloud == null ? null : cloud,
         "feelslike_c": feelslikeC == null ? null : feelslikeC,
     };
 }
