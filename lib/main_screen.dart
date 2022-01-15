@@ -32,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           Expanded( flex: 10, child: mainCity()),
           Spacer(flex: 1,),
-          Expanded(child: Align(alignment: Alignment.center, child: Text("Other Citys",style: context.theme.textTheme.headline6))),
+          Expanded(child: Align(alignment: Alignment.center, child: Text("Other Cities",style: context.theme.textTheme.headline6))),
           Spacer(),
           Expanded( flex: 15, child: otherCities(),
           )
@@ -45,14 +45,9 @@ class _MainScreenState extends State<MainScreen> {
     return FutureBuilder<Weather>(
       future: _api.getWeather("Kocaeli"),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {  
-          Weather? _weather = snapshot.data;
-          return cardMainCityWeather(_weather!);
-        } else if (snapshot.hasError) {
-          return Text(snapshot.error.toString());
-        }
-        return Center(child: CircularProgressIndicator());
-      },
+        Weather? _weather = snapshot.data;
+        return _weather?.location != null ? cardMainCityWeather(_weather!) : customCircleIndicator();
+      } 
     );
   }
 
@@ -96,14 +91,9 @@ class _MainScreenState extends State<MainScreen> {
     return FutureBuilder<Weather>(
       future: _api.getWeather(city),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {  
-          Weather? _weather = snapshot.data;
-          return otherCityCard(_weather!);
-        } else if (snapshot.hasError) {
-          return Text(snapshot.error.toString());
-        }
-        return Center(child: CircularProgressIndicator());
-      },
+        Weather? _weather = snapshot.data;
+        return _weather?.location != null ? otherCityCard(_weather!) : customCircleIndicator();
+      }
     );
   }
 

@@ -18,30 +18,36 @@ class _DetailScreenState extends State<DetailScreen> {
   double windSpeed = 20;
   double humidity = 0;
 
-
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 500), () {
+      
       setState(() {
-        feelsLikeC +=-41;//widget.weather.current!.feelslikeC*5;
+        if (widget.weather.current!.feelslikeC<0) {
+          feelsLikeC +=-widget.weather.current!.feelslikeC*5;
+        }else{
+          feelsLikeC +=widget.weather.current!.feelslikeC*5;
+        }
         windSpeed += widget.weather.current!.windKph*5;
-        humidity += widget.weather.current!.humidity*2;
-        //TODO: max values 210
+        humidity += widget.weather.current!.humidity*(context.dynamicHeight(0.3)/100);
+
+        //TODO: max values context.dynamicHeight(0.3)
         if (feelsLikeC<20) {
           feelsLikeC=20;
         }
-        if (feelsLikeC>205) {
-          feelsLikeC=205;
+        if (feelsLikeC>context.dynamicHeight(0.3)) {
+          feelsLikeC=context.dynamicHeight(0.3);
         }
-        if (windSpeed<=0) {
+        if (windSpeed<20) {
           windSpeed=20;
         }    
-        if (windSpeed>205) {
-          windSpeed=205;
+        if (windSpeed>context.dynamicHeight(0.3)) {
+          windSpeed=context.dynamicHeight(0.3);
         }
       });
     });
+    
   }
 
   @override
@@ -62,7 +68,7 @@ class _DetailScreenState extends State<DetailScreen> {
           Text(utf8convert(widget.weather.current!.condition!.text),style: context.theme.textTheme.headline5!.copyWith(color: Color(0xff43656A))),
           Text(widget.weather.location!.name.toString(),style: context.theme.textTheme.headline4!.copyWith(color: Color(0xff43656A))),
           Text(widget.weather.current!.tempC.toInt().toString()+"°",style: context.theme.textTheme.headline3!.copyWith(color: Color(0xff43656A))),
-          SizedBox(width: context.dynamicWidth(0.6), child: Image.network("http:"+widget.weather.current!.condition!.icon, fit: BoxFit.cover)),
+          Expanded(child: Image.network("http:"+widget.weather.current!.condition!.icon, fit: BoxFit.cover)),
           Expanded(child: statusBars())
         ],
       ),
