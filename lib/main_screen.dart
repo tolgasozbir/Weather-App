@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:weather_app/Api.dart';
 import 'package:weather_app/context_extension.dart';
 import 'package:weather_app/detail_screen.dart';
-
+import 'package:weather_app/utils.dart';
 import 'package:weather_app/weather.dart';
-import 'dart:convert';
 class MainScreen extends StatefulWidget {
   const MainScreen({ Key? key }) : super(key: key);
 
@@ -15,11 +14,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
 
   Api _api = Api();
-
-  String utf8convert(String text) {
-    List<int> bytes = text.toString().codeUnits;
-    return utf8.decode(bytes);
-  }
 
   @override
   Widget build(BuildContext context) {
