@@ -43,10 +43,10 @@ class _MainScreenState extends State<MainScreen> {
 
   FutureBuilder<Weather> mainCity() {
     return FutureBuilder<Weather>(
-      future: _api.getWeather("Kocaeli"),
+      future: _api.getWeather(firstCity),
       builder: (context, snapshot) {
         Weather? _weather = snapshot.data;
-        return _weather?.location != null ? cardMainCityWeather(_weather!) : customCircleIndicator();
+        return _weather?.location != null ? cardMainCityWeather(_weather!,1) : customCircleIndicator();
       } 
     );
   }
@@ -70,9 +70,9 @@ class _MainScreenState extends State<MainScreen> {
   Row otherCitiesTop() {
     return Row( mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Expanded(flex: 12, child: futureBuilderCity("İstanbul")),
+        Expanded(flex: 12, child: futureBuilderCity(otherCity1,2)),
         Spacer(),
-        Expanded(flex: 12, child: futureBuilderCity("Ankara"))
+        Expanded(flex: 12, child: futureBuilderCity(otherCity2,3))
       ],
     );
   }
@@ -80,24 +80,24 @@ class _MainScreenState extends State<MainScreen> {
   Row otherCitiesBottom() {
     return Row( mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Expanded(flex: 16, child: futureBuilderCity("New york")),
+        Expanded(flex: 16, child: futureBuilderCity(otherCity3,4)),
         Spacer(),
-        Expanded(flex: 16, child: futureBuilderCity("Paris"))
+        Expanded(flex: 16, child: futureBuilderCity(otherCity4,5))
       ],
     );
   }
 
-  FutureBuilder<Weather> futureBuilderCity(String city) {
+  FutureBuilder<Weather> futureBuilderCity(String city,int cardId) {
     return FutureBuilder<Weather>(
       future: _api.getWeather(city),
       builder: (context, snapshot) {
         Weather? _weather = snapshot.data;
-        return _weather?.location != null ? otherCityCard(_weather!) : customCircleIndicator();
+        return _weather?.location != null ? otherCityCard(_weather!,cardId) : customCircleIndicator();
       }
     );
   }
 
-  Widget otherCityCard(Weather? weatherOther) {
+  Widget otherCityCard(Weather? weatherOther,int cardId) {
     return GestureDetector(
       child: Container(
         decoration: BoxDecoration(
@@ -130,12 +130,12 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weatherOther)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weatherOther, selectedCard: cardId,)));
       },
     );
   }
 
-  Widget cardMainCityWeather(Weather weather) {
+  Widget cardMainCityWeather(Weather weather,int cardId) {
     String weatherText = utf8convert(weather.current!.condition!.text);
     return GestureDetector(
       child: Container(
@@ -207,7 +207,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weather)));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weather,selectedCard: cardId,)));
           },
     );
   }

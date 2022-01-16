@@ -1,6 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
+String firstCity = "Kocaeli";
+String otherCity1 = "Istanbul";
+String otherCity2 = "Ankara";
+String otherCity3 = "New York";
+String otherCity4 = "Paris";
+
 String utf8convert(String text) {
   List<int> bytes = text.toString().codeUnits;
   return utf8.decode(bytes);

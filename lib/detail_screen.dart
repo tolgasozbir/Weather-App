@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:weather_app/context_extension.dart';
 import 'package:weather_app/utils.dart';
 import 'package:weather_app/weather.dart';
+import 'package:http/http.dart' as http;
 
 class DetailScreen extends StatefulWidget {
-  const DetailScreen({required this.weather, Key? key }) : super(key: key);
+  DetailScreen({required this.weather, required this.selectedCard, Key? key }) : super(key: key);
 
-  final Weather weather;
+  Weather weather;
+  final int selectedCard;
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
@@ -50,14 +52,84 @@ class _DetailScreenState extends State<DetailScreen> {
     
   }
 
+
+  bool isSearch=false;
+  TextEditingController tfController = TextEditingController();
+  late Weather temp;
+  String tempCityName ="";
+
+  checkCity(String city) async {
+    String _apiKey="f56ba9a7740648168f9192842210210";
+    var url=Uri.parse("http://api.weatherapi.com/v1/current.json?key=${_apiKey}&q=${city}&aqi=no&lang=tr");
+    var response = await http.get(url);
+    temp=weatherFromJson(response.body);
+    if (temp.location?.region != null) {
+      tempCityName = temp.location!.region;
+      widget.weather = temp;
+      print(tempCityName);
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffCBE6F9),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SafeArea(child: body()),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        isSearch=false;
+      },
+      child: Scaffold(
+        backgroundColor: Color(0xffCBE6F9),
+        //extendBodyBehindAppBar: true,
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: BackButton(color: Colors.black),
+          centerTitle: true,
+          title: isSearch==false ? searchText() : searchTextField(),
+          actions: [
+            IconButton(
+              icon : Icon(Icons.search,color: Colors.black,),
+              onPressed: (){
+                isSearch = !isSearch;
+                
+                if (isSearch == false) {
+                  switch (widget.selectedCard) {
+                    case 1: firstCity=tempCityName; break;
+                    case 2: otherCity1=tempCityName; break;
+                    case 3: otherCity2=tempCityName; break;
+                    case 4: otherCity3=tempCityName; break;
+                    case 5: otherCity4=tempCityName; break;
+                  }
+                  setState(() {});
+                }
+                setState(() { });
+                
+              },
+            )
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SafeArea(child: body()),
+        ),
       ),
+    );
+  }
+
+  Text searchText() => Text("Search",style: TextStyle(color: Colors.black),);
+
+  TextField searchTextField() {
+    return TextField(
+      controller: tfController,
+      autofocus: true,
+      decoration: InputDecoration(
+        hintText: "Search"
+      ),
+      onChanged: (value){
+        checkCity(value);
+      },
     );
   }
 
@@ -68,8 +140,8 @@ class _DetailScreenState extends State<DetailScreen> {
           Text(utf8convert(widget.weather.current!.condition!.text),style: context.theme.textTheme.headline5!.copyWith(color: Color(0xff43656A))),
           Text(widget.weather.location!.name.toString(),style: context.theme.textTheme.headline4!.copyWith(color: Color(0xff43656A))),
           Text(widget.weather.current!.tempC.toInt().toString()+"°",style: context.theme.textTheme.headline3!.copyWith(color: Color(0xff43656A))),
-          Expanded(child: Image.network("http:"+widget.weather.current!.condition!.icon, fit: BoxFit.cover)),
-          Expanded(child: statusBars())
+          Expanded(flex: 8, child: Image.network("http:"+widget.weather.current!.condition!.icon, fit: BoxFit.cover)),
+          Expanded(flex: 10, child: statusBars())
         ],
       ),
     );
@@ -88,7 +160,7 @@ class _DetailScreenState extends State<DetailScreen> {
   Column bar(String title, String weatherDetail, String symbol, Widget animContain) {
     return Column(mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        stackContain(animContain),
+        Expanded(child: stackContain(animContain)),
         const SizedBox(height: 8,),
         Text(title),
         Text(weatherDetail+"${symbol}",style: context.theme.textTheme.headline6!.copyWith(fontWeight: FontWeight.normal)),
@@ -104,7 +176,6 @@ class _DetailScreenState extends State<DetailScreen> {
       ],
     );
   }
-
 
   AnimatedContainer animContainHumidity() {
     return AnimatedContainer(
@@ -181,7 +252,7 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-    Container backgroundContainer() {
+  Container backgroundContainer() {
     return Container(
       width: context.dynamicWidth(0.1),
       height: context.dynamicHeight(0.3),
