@@ -2,15 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 class TempCityName {
+  late String id;
   late String name;
-  TempCityName(this.name);
+  TempCityName(this.id, this.name);
 }
 
-TempCityName firstCity = TempCityName("Kocaeli");
-TempCityName otherCity1 = TempCityName("Istanbul");
-TempCityName otherCity2 = TempCityName("Ankara");
-TempCityName otherCity3 = TempCityName("New York");
-TempCityName otherCity4 = TempCityName("Paris");
+TempCityName firstCity = TempCityName("1","Kocaeli");
+TempCityName otherCity1 = TempCityName("2","Istanbul");
+TempCityName otherCity2 = TempCityName("3","Ankara");
+TempCityName otherCity3 = TempCityName("4","New York");
+TempCityName otherCity4 = TempCityName("5","Paris");
+
+List<TempCityName> allCities = [firstCity,otherCity1,otherCity2,otherCity3,otherCity4];
 
 String utf8convert(String text) {
   List<int> bytes = text.toString().codeUnits;

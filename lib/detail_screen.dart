@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/context_extension.dart';
 import 'package:weather_app/main_screen.dart';
+import 'package:weather_app/shared_preferences.dart';
 import 'package:weather_app/utils.dart';
 import 'package:weather_app/weather.dart';
 import 'package:http/http.dart' as http;
@@ -68,6 +69,7 @@ class _DetailScreenState extends State<DetailScreen> {
       if (temp.location?.region != null) {
         widget.tempCity.name = temp.location!.region;
         widget.weather = temp;
+        SharedData().setValue(widget.tempCity);
       }else{
         temp=widget.weather;
       }

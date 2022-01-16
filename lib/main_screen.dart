@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:weather_app/Api.dart';
 import 'package:weather_app/context_extension.dart';
 import 'package:weather_app/detail_screen.dart';
+import 'package:weather_app/shared_preferences.dart';
 import 'package:weather_app/utils.dart';
 import 'package:weather_app/weather.dart';
 class MainScreen extends StatefulWidget {
@@ -15,15 +18,19 @@ class _MainScreenState extends State<MainScreen> {
 
   Api _api = Api();
 
-  refresh() async {
-    setState(() {});
+  @override
+  void initState() {
+    super.initState();
+    Timer(Duration(milliseconds: 500), (){
+      SharedData().getValues(allCities);
+      setState(() {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(onPressed: refresh),
         backgroundColor: Color(0xffCBE6F9),
         body: Center(
           child: weatherData()
