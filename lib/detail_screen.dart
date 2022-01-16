@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/context_extension.dart';
+import 'package:weather_app/main_screen.dart';
 import 'package:weather_app/utils.dart';
 import 'package:weather_app/weather.dart';
 import 'package:http/http.dart' as http;
 
 class DetailScreen extends StatefulWidget {
-  DetailScreen({required this.weather, required this.selectedCard, Key? key }) : super(key: key);
+  DetailScreen({required this.weather, required this.tempCity, Key? key }) : super(key: key);
 
   Weather weather;
-  final int selectedCard;
+  TempCityName tempCity;
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
@@ -23,6 +24,7 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   void initState() {
     super.initState();
+    temp=widget.weather;
     Future.delayed(const Duration(milliseconds: 500), () {
       
       setState(() {
@@ -56,20 +58,29 @@ class _DetailScreenState extends State<DetailScreen> {
   bool isSearch=false;
   TextEditingController tfController = TextEditingController();
   late Weather temp;
-  String tempCityName ="";
 
   checkCity(String city) async {
     String _apiKey="f56ba9a7740648168f9192842210210";
-    var url=Uri.parse("http://api.weatherapi.com/v1/current.json?key=${_apiKey}&q=${city}&aqi=no&lang=tr");
-    var response = await http.get(url);
-    temp=weatherFromJson(response.body);
-    if (temp.location?.region != null) {
-      tempCityName = temp.location!.region;
-      widget.weather = temp;
-      print(tempCityName);
+    try {
+      var url=Uri.parse("http://api.weatherapi.com/v1/current.json?key=${_apiKey}&q=${city}&aqi=no&lang=tr");
+      var response = await http.get(url);
+      temp=weatherFromJson(response.body);
+      if (temp.location?.region != null) {
+        widget.tempCity.name = temp.location!.region;
+        widget.weather = temp;
+      }else{
+        temp=widget.weather;
+      }
+      setState(() { });
+    } catch (e) {
+      print(e);
     }
   }
 
+  void refreshAndBack(){
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>MainScreen()),
+    (Route<dynamic> route) => false).then((_) => setState(() { }));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,41 +89,42 @@ class _DetailScreenState extends State<DetailScreen> {
         FocusScope.of(context).unfocus();
         isSearch=false;
       },
-      child: Scaffold(
-        backgroundColor: Color(0xffCBE6F9),
-        //extendBodyBehindAppBar: true,
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: BackButton(color: Colors.black),
-          centerTitle: true,
-          title: isSearch==false ? searchText() : searchTextField(),
-          actions: [
-            IconButton(
-              icon : Icon(Icons.search,color: Colors.black,),
-              onPressed: (){
-                isSearch = !isSearch;
-                
-                if (isSearch == false) {
-                  switch (widget.selectedCard) {
-                    case 1: firstCity=tempCityName; break;
-                    case 2: otherCity1=tempCityName; break;
-                    case 3: otherCity2=tempCityName; break;
-                    case 4: otherCity3=tempCityName; break;
-                    case 5: otherCity4=tempCityName; break;
-                  }
+      child: WillPopScope(
+        onWillPop: () async {
+          refreshAndBack();
+          return true;
+        },
+        child: Scaffold(
+          backgroundColor: Color(0xffCBE6F9),
+          //extendBodyBehindAppBar: true,
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: BackButton(color: Colors.black, onPressed: (){
+      
+            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>MainScreen()),
+            (Route<dynamic> route) => false).then((_) => setState(() { }));
+      
+            }),
+            centerTitle: true,
+            title: isSearch==false ? searchText() : searchTextField(),
+            actions: [
+              IconButton(
+                icon : Icon(Icons.search,color: Colors.black,),
+                onPressed: (){
+                  isSearch = !isSearch;
+                  checkCity(tfController.text);
                   setState(() {});
-                }
-                setState(() { });
-                
-              },
-            )
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SafeArea(child: body()),
+                  tfController.text="";
+                },
+              )
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SafeArea(child: body()),
+          ),
         ),
       ),
     );
@@ -127,8 +139,12 @@ class _DetailScreenState extends State<DetailScreen> {
       decoration: InputDecoration(
         hintText: "Search"
       ),
-      onChanged: (value){
+      onSubmitted: (value){
         checkCity(value);
+        FocusScope.of(context).unfocus();
+        isSearch=false;
+        setState(() {});
+        tfController.text="";
       },
     );
   }

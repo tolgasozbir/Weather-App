@@ -15,12 +15,19 @@ class _MainScreenState extends State<MainScreen> {
 
   Api _api = Api();
 
+  refresh() async {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffCBE6F9),
-      body: Center(
-        child: weatherData()
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(onPressed: refresh),
+        backgroundColor: Color(0xffCBE6F9),
+        body: Center(
+          child: weatherData()
+        ),
       ),
     );
   }
@@ -43,10 +50,10 @@ class _MainScreenState extends State<MainScreen> {
 
   FutureBuilder<Weather> mainCity() {
     return FutureBuilder<Weather>(
-      future: _api.getWeather(firstCity),
+      future: _api.getWeather(firstCity.name),
       builder: (context, snapshot) {
         Weather? _weather = snapshot.data;
-        return _weather?.location != null ? cardMainCityWeather(_weather!,1) : customCircleIndicator();
+        return _weather?.location != null ? cardMainCityWeather(_weather!) : customCircleIndicator();
       } 
     );
   }
@@ -70,9 +77,9 @@ class _MainScreenState extends State<MainScreen> {
   Row otherCitiesTop() {
     return Row( mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Expanded(flex: 12, child: futureBuilderCity(otherCity1,2)),
+        Expanded(flex: 12, child: futureBuilderCity(otherCity1.name,otherCity1)),
         Spacer(),
-        Expanded(flex: 12, child: futureBuilderCity(otherCity2,3))
+        Expanded(flex: 12, child: futureBuilderCity(otherCity2.name,otherCity2))
       ],
     );
   }
@@ -80,24 +87,24 @@ class _MainScreenState extends State<MainScreen> {
   Row otherCitiesBottom() {
     return Row( mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Expanded(flex: 16, child: futureBuilderCity(otherCity3,4)),
+        Expanded(flex: 16, child: futureBuilderCity(otherCity3.name,otherCity3)),
         Spacer(),
-        Expanded(flex: 16, child: futureBuilderCity(otherCity4,5))
+        Expanded(flex: 16, child: futureBuilderCity(otherCity4.name,otherCity4))
       ],
     );
   }
 
-  FutureBuilder<Weather> futureBuilderCity(String city,int cardId) {
+  FutureBuilder<Weather> futureBuilderCity(String city,TempCityName tempOther) {
     return FutureBuilder<Weather>(
       future: _api.getWeather(city),
       builder: (context, snapshot) {
         Weather? _weather = snapshot.data;
-        return _weather?.location != null ? otherCityCard(_weather!,cardId) : customCircleIndicator();
+        return _weather?.location != null ? otherCityCard(_weather!,tempOther) : customCircleIndicator();
       }
     );
   }
 
-  Widget otherCityCard(Weather? weatherOther,int cardId) {
+  Widget otherCityCard(Weather? weatherOther,TempCityName tempOther) {
     return GestureDetector(
       child: Container(
         decoration: BoxDecoration(
@@ -121,7 +128,7 @@ class _MainScreenState extends State<MainScreen> {
               Column(crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(weatherOther!.location!.name,style: context.theme.textTheme.headline5!.copyWith(fontWeight: FontWeight.w600)),
-                  SizedBox(width: context.dynamicWidth(0.16), child: Image.network("http:"+weatherOther.current!.condition!.icon,fit: BoxFit.cover,)),
+                  SizedBox(width: context.dynamicWidth(0.20), child: Image.network("http:"+weatherOther.current!.condition!.icon,fit: BoxFit.cover,)),
                 ],
               ),
               Positioned(bottom: 0, right: 0, child: Text(weatherOther.current!.tempC.toString()+"°",style: context.theme.textTheme.headline4)),
@@ -130,12 +137,12 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weatherOther, selectedCard: cardId,)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weatherOther, tempCity: tempOther)));
       },
     );
   }
 
-  Widget cardMainCityWeather(Weather weather,int cardId) {
+  Widget cardMainCityWeather(Weather weather) {
     String weatherText = utf8convert(weather.current!.condition!.text);
     return GestureDetector(
       child: Container(
@@ -158,18 +165,12 @@ class _MainScreenState extends State<MainScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
+                  Text(weather.location!.region,style: context.theme.textTheme.headline4!.copyWith(color: Color(0xBF000000),fontWeight: FontWeight.w500)),
+                  Text(weatherText),
                   Expanded(
-                    child: Row(
+                    child: Row( mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(width: context.dynamicWidth(0.32), child: Image.network("http:"+weather.current!.condition!.icon,fit: BoxFit.contain,)),
-                        Expanded(
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(weather.location!.region,style: context.theme.textTheme.headline4!.copyWith(color: Color(0xBF000000),fontWeight: FontWeight.w500)),
-                              Text(weatherText),
-                            ],
-                          ),
-                        ),
+                        SizedBox(width: context.dynamicWidth(0.30), child: Image.network("http:"+weather.current!.condition!.icon,fit: BoxFit.contain,)),
                         Text(weather.current!.tempC.toInt().toString()+"°",style: context.theme.textTheme.headline2)
                       ],
                     ),
@@ -207,7 +208,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weather,selectedCard: cardId,)));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(weather: weather,tempCity: firstCity,)));
           },
     );
   }
